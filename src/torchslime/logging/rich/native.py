@@ -2,17 +2,19 @@
 Rich Native Utils
 """
 from torchslime.utils.store import store
-from torchslime.utils.typing import (
-    MISSING,
+from torchslime.utils.typing.native import (
     Iterable,
-    Missing,
-    NoneOrNothing,
-    Pass,
     Union,
-    Nothing,
-    NOTHING,
     TypeVar,
     Type
+)
+from torchslime.utils.typing.extension import (
+    MISSING,
+    Missing,
+    NoneOrNothing,
+    Nothing,
+    NOTHING,
+    Pass
 )
 from torchslime.utils.launch import LaunchUtil, Launcher
 from torchslime.utils.base import (
@@ -22,13 +24,6 @@ from torchslime.utils.base import (
     ScopedAttrRestore,
     BiList,
     MutableBiListItem
-)
-from torchslime.utils.metaclass import (
-    Metaclasses,
-    InitOnceMetaclass
-)
-from abc import (
-    ABCMeta
 )
 from rich.progress import (
     Progress,
@@ -159,8 +154,7 @@ class SlimeLiveLauncher(
     Live,
     _StartStopObserverManager,
     RichLauncher,
-    SlimeConsoleObserver,
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    SlimeConsoleObserver
 ):
     
     def __init__(
@@ -218,8 +212,7 @@ class SlimeProgressLauncher(
     _StartStopObserverManager,
     MutableBiListItem,
     RichLauncher,
-    SlimeConsoleObserver,
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    SlimeConsoleObserver
 ):
 
     def __init__(
@@ -308,8 +301,7 @@ _RichRenderableT = TypeVar("_RichRenderableT", bound=Union[RenderableType, Mutab
 class SlimeGroup(
     Group,
     MutableBiListItem,
-    BiList[_RichRenderableT],
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    BiList[_RichRenderableT]
 ):
     
     def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:

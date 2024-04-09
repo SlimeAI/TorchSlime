@@ -16,22 +16,24 @@ __all__ = (
     'LRScheduleHandler'
 )
 
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Dict,
     List,
     Callable,
     Iterable,
     Mapping,
     Tuple,
-    is_none_or_nothing,
     Any,
     Sequence,
     Union,
+    TYPE_CHECKING
+)
+from torchslime.utils.typing.extension import (
+    is_none_or_nothing,
     NoneOrNothing,
     NOTHING,
     PASS,
     Pass,
-    TYPE_CHECKING,
     MISSING,
     Missing
 )
@@ -39,23 +41,18 @@ from torchslime.utils.common import (
     get_len,
     type_cast
 )
-from torchslime.utils.metaclass import (
-    Metaclasses,
-    InitOnceMetaclass
-)
 from torchslime.utils.base import BaseList
-from torchslime.pipelines.metric import MeterDict
+from torchslime.pipeline.metric import MeterDict
 from torchslime.utils.store import store
 from torchslime.utils.decorator import CallDebug
-from torchslime.handlers import Handler, HandlerContainer
-from torchslime.pipelines.state import ModelState
+from torchslime.handler import Handler, HandlerContainer
+from torchslime.pipeline.state import ModelState
 from torchslime.logging.logger import logger
 from torchslime.logging.rich import ProfileProgress, SlimeLiveLauncher, SlimeGroup, SlimeProgressLauncher
 from .riching import ProgressInterface, ProfileProgressInterface
 from functools import wraps
 from itertools import cycle
 from torch import set_grad_enabled
-from abc import ABCMeta
 # Type check only
 if TYPE_CHECKING:
     from .wrapper import HandlerWrapper
@@ -92,8 +89,7 @@ class EmptyHandler(Handler):
 
 class FuncHandler(
     Handler,
-    BaseList[Callable[["Context"], None]],
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    BaseList[Callable[["Context"], None]]
 ):
     
     def __init__(

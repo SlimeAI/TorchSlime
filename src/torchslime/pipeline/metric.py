@@ -4,17 +4,19 @@ from torchslime.utils.common import (
     safe_divide,
     GreaterThanAnything
 )
-from torchslime.utils.typing import (
-    NOTHING,
+from torchslime.utils.typing.native import (
     Mapping,
-    NoneOrNothing,
     Union,
     Dict,
     Iterable,
     Callable,
     Any,
-    is_none_or_nothing,
     TYPE_CHECKING
+)
+from torchslime.utils.typing.extension import (
+    NOTHING,
+    NoneOrNothing,
+    is_none_or_nothing
 )
 from torchslime.utils.base import BaseDict, BaseList
 from torchslime.utils.registry import Registry

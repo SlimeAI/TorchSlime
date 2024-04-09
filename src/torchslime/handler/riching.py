@@ -1,12 +1,14 @@
-from torchslime.utils.typing import (
-    NOTHING,
+from torchslime.utils.typing.native import (
     Any,
     Callable,
     Iterable,
-    NoneOrNothing,
     Tuple,
     TYPE_CHECKING,
-    Union,
+    Union
+)
+from torchslime.utils.typing.extension import (
+    NOTHING,
+    NoneOrNothing,
     is_none_or_nothing
 )
 from torchslime.logging.rich import (
@@ -27,8 +29,8 @@ from contextlib import contextmanager
 
 if TYPE_CHECKING:
     from torchslime.context import Context
-    from torchslime.handlers import Handler
-    from torchslime.handlers.wrapper import HandlerWrapper, HandlerWrapperContainer
+    from torchslime.handler import Handler
+    from torchslime.handler.wrapper import HandlerWrapper, HandlerWrapperContainer
 
 #
 # Handler Progress Interface
@@ -108,7 +110,7 @@ class HandlerTreeProfiler:
         wrap_func: Union[str, Callable[[Group, "Handler"], Group], NoneOrNothing] = NOTHING
     ) -> Group:
         renderables = [
-            Text(handler.get_class_name(), style='bold blue')
+            Text(handler.get_classname(), style='bold blue')
         ]
 
         if display_attr:
@@ -173,9 +175,7 @@ class HandlerTreeProfiler:
     ) -> bool:
         return handler in BaseList.create__(
             target_handlers,
-            return_none=False,
-            return_nothing=False,
-            return_pass=False
+            return_constant=False
         )
 
     def get_handler_profile_wrap_func(
@@ -226,7 +226,7 @@ class HandlerWrapperContainerProfiler:
     ) -> str:
         from torchslime.utils.common import dict_to_key_value_str_list, concat_format
 
-        class_name = wrapper.get_class_name()
+        class_name = wrapper.get_classname()
 
         display_attr_dict = wrapper.get_display_attr_dict()
         # Remove the ignored display attributes.

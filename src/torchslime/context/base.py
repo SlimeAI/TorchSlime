@@ -1,26 +1,24 @@
 from torchslime.context.compile import Compile
 from torchslime.utils.base import Base
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Any,
     Sequence,
     Union,
     Dict,
     Callable,
     List,
-    TYPE_CHECKING,
+    TYPE_CHECKING
+)
+from torchslime.utils.typing.extension import (
     NOTHING,
     Nothing,
     is_none_or_nothing,
-    TorchLRScheduler
+    resolve_private_attr_name
 )
+from torchslime.utils.typing import TorchLRScheduler
 from torchslime.utils.exception import APIMisused
 from torchslime.logging.logger import logger, LoggerKwargs
-from torchslime.utils.metaclass import (
-    Metaclasses,
-    InitOnceMetaclass
-)
-from slime_core.context import CoreTempContext, CoreHookContext, CoreContext
-from abc import ABCMeta
+from slime_core.abc.context import CoreTempContext, CoreHookContext, CoreContext
 from torch import (
     Tensor,
     device
@@ -38,11 +36,7 @@ if TYPE_CHECKING:
     from .compile import Compile
 
 
-class TempContext(
-    Base,
-    CoreTempContext,
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
-):
+class TempContext(Base, CoreTempContext):
     def __init__(self):
         Base.__init__(self)
         CoreTempContext.__init__(self)
@@ -98,7 +92,7 @@ class BaseContext(TempContext, CoreContext["Compile"]):
     def get_compile(self) -> Union["Compile", Nothing]:
         from .compile import Compile
         
-        if not self.hasattr__('_BaseContext__compile'):
+        if not self.hasattr__(resolve_private_attr_name(BaseContext, '__compile')):
             logger.warning(
                 'Property ``compile`` has not been bound to an object yet.'
             )
@@ -125,25 +119,27 @@ class BaseContext(TempContext, CoreContext["Compile"]):
 
     def ctx_check(self, items: Union[str, Sequence[str]], silent: bool = True):
         # check single item
-        def _check(_item):
-            _result = super(BaseContext, self).check__(_item)
-            if _result is False:
-                msg = 'Context check failed: got NOTHING with key \'%s\'.' % _item
-                if silent is True:
-                    logger.debug(msg, LoggerKwargs(stacklevel=3))
-                else:
-                    logger.warning(msg, LoggerKwargs(stacklevel=3))
-            return _result
+        # TODO: refactor
+        return True
+        # def _check(_item):
+        #     _result = super(BaseContext, self).check__(_item)
+        #     if _result is False:
+        #         msg = 'Context check failed: got NOTHING with key \'%s\'.' % _item
+        #         if silent is True:
+        #             logger.debug(msg, LoggerKwargs(stacklevel=3))
+        #         else:
+        #             logger.warning(msg, LoggerKwargs(stacklevel=3))
+        #     return _result
 
-        if isinstance(items, (list, tuple)):
-            # sequence value
-            for item in items:
-                if _check(str(item)) is False:
-                    return False
-            return True
-        else:
-            # single value
-            return _check(str(items))
+        # if isinstance(items, (list, tuple)):
+        #     # sequence value
+        #     for item in items:
+        #         if _check(str(item)) is False:
+        #             return False
+        #     return True
+        # else:
+        #     # single value
+        #     return _check(str(items))
 
 
 class StepContext(TempContext):
@@ -185,7 +181,7 @@ class IterationContext(TempContext):
         self.total: int = NOTHING
         self.start: int = 0
         # average information in one period (e.g. epoch or a specified number of steps)
-        from torchslime.pipelines.metric import MeterDict
+        from torchslime.pipeline.metric import MeterDict
         # average train metrics
         self.train_metrics: MeterDict = MeterDict()
         # average eval metrics
@@ -200,7 +196,7 @@ class PipelineContext(TempContext):
 
     def initialize(self):
         # handler containers that define the process of training, evaluating and predicting.
-        from torchslime.handlers import HandlerContainer
+        from torchslime.handler import HandlerContainer
         self.train_container: Union[HandlerContainer, Nothing] = NOTHING
         self.eval_container: Union[HandlerContainer, Nothing] = NOTHING
         self.predict_container: Union[HandlerContainer, Nothing] = NOTHING
@@ -213,31 +209,31 @@ class PipelineContext(TempContext):
         # optimizer
         self.optimizer: Optimizer = NOTHING
         # loss_func
-        from torchslime.pipelines.metric import LossFuncContainer
+        from torchslime.pipeline.metric import LossFuncContainer
         self.loss_func: Union[LossFuncContainer, Nothing] = NOTHING
         # gradient accumulation
         self.grad_acc: int = 1
         # learning rate scheduler
         self.lr_scheduler: TorchLRScheduler = NOTHING
         # data provider
-        from torchslime.pipelines.data import DataProvider
+        from torchslime.pipeline.data import DataProvider
         self.train_provider: DataProvider = NOTHING
         self.eval_provider: DataProvider = NOTHING
         # data parser
-        from torchslime.pipelines.data import DataParser, IndexParser
+        from torchslime.pipeline.data import DataParser, IndexParser
         # the data parser should be set to IndexParser as default
         self.data_parser: DataParser = IndexParser()
         # metric container
-        from torchslime.pipelines.metric import MetricContainer
+        from torchslime.pipeline.metric import MetricContainer
         self.metrics: Union[MetricContainer, Nothing] = NOTHING
         # loss reduction func
-        from torchslime.pipelines.metric import LossReductionFactory
+        from torchslime.pipeline.metric import LossReductionFactory
         self.loss_reduction: Callable[[BaseContext], Tensor] = LossReductionFactory.get('mean')
         # model state
-        from torchslime.pipelines.state import ModelState
+        from torchslime.pipeline.state import ModelState
         self.model_state: Union[ModelState, Nothing] = NOTHING
         # pipeline profiler
-        from torchslime.pipelines.profiler import PipelineProfiler, profiler_registry
+        from torchslime.pipeline.profiler import PipelineProfiler, profiler_registry
         self.pipeline_profiler: Union[PipelineProfiler, Nothing] = profiler_registry.get('vanilla')()
 
 
@@ -245,11 +241,11 @@ class HandlerContext(TempContext):
 
     def initialize(self):
         # base handlers
-        from torchslime import handlers
-        self.Handler = handlers.Handler
-        self.Container = handlers.HandlerContainer
+        from torchslime import handler
+        self.Handler = handler.Handler
+        self.Container = handler.HandlerContainer
         
-        from torchslime.handlers import common
+        from torchslime.handler import common
         # the root container, should be used only once in a single container structure
         self.RootContainer = common.RootContainer
         # common handlers
@@ -270,7 +266,7 @@ class HandlerContext(TempContext):
         self.FuncHandler = common.FuncHandler
         
         # handler wrappers
-        from torchslime.handlers import wrapper
+        from torchslime.handler import wrapper
         self.Wrapper = wrapper.HandlerWrapper
         self.WrapperContainer = wrapper.HandlerWrapperContainer
         self.StateWrapper = wrapper.StateWrapper
@@ -288,13 +284,13 @@ class HookContext(TempContext, CoreHookContext):
 
     def initialize(self):
         # hooks
-        from torchslime.hooks.plugin import PluginContainer
+        from torchslime.hook.plugin import PluginContainer
         self.plugins: PluginContainer = PluginContainer()
         
-        from torchslime.hooks.launch import LaunchHook
+        from torchslime.hook.launch import LaunchHook
         self.launch: Union[LaunchHook, Nothing] = NOTHING
         
-        from torchslime.hooks.build import BuildHook
+        from torchslime.hook.build import BuildHook
         self.build: Union[BuildHook, Nothing] = NOTHING
 
 

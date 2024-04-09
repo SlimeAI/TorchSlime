@@ -1,19 +1,21 @@
 """
 Analyzing context profile.
 """
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     TYPE_CHECKING,
     Union,
     Any,
     Dict,
+    Type,
+    Callable,
+    Tuple
+)
+from torchslime.utils.typing.extension import (
     NoneOrNothing,
     is_none_or_nothing,
     NOTHING,
-    Type,
-    Callable,
     MISSING,
-    Missing,
-    Tuple
+    Missing
 )
 from torchslime.utils.common import dict_to_key_value_str
 from torchslime.utils.registry import Registry

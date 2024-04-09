@@ -1,24 +1,26 @@
-from torchslime.handlers.riching import HandlerTreeProfiler
+from torchslime.handler.riching import HandlerTreeProfiler
 from torchslime.utils.common import (
     Count,
     dict_to_key_value_str_list,
     concat_format
 )
-from torchslime.utils.typing import (
-    NOTHING,
-    Nothing,
-    NoneOrNothing,
+from torchslime.utils.typing.native import (
     Union,
     List,
     Callable,
     Iterable,
     Tuple,
-    is_none_or_nothing,
     TypeVar,
-    Pass,
-    PASS,
     TYPE_CHECKING,
     Generic
+)
+from torchslime.utils.typing.extension import (
+    NOTHING,
+    Nothing,
+    NoneOrNothing,
+    is_none_or_nothing,
+    Pass,
+    PASS
 )
 from torchslime.logging.logger import logger
 from torchslime.logging.rich import (
@@ -38,15 +40,10 @@ from torchslime.utils.exception import (
     HandlerContinue,
     HandlerWrapperException
 )
-from torchslime.utils.metaclass import (
-    Metaclasses,
-    InitOnceMetaclass
-)
-from slime_core.handlers import (
+from slime_core.abc.handler import (
     CoreHandler,
     CoreHandlerContainer
 )
-from abc import ABCMeta
 from functools import partial
 
 if TYPE_CHECKING:
@@ -164,14 +161,14 @@ class Handler(
             console.print(root)
     
     def __str__(self) -> str:
-        class_name = self.get_class_name()
+        class_name = self.get_classname()
         
         display_attr_list = dict_to_key_value_str_list(self.get_display_attr_dict())
         attr = concat_format('(', display_attr_list, ')', break_line=False, item_sep=', ')
         
         return f'{class_name}{attr}'
     
-    def get_class_name(self) -> str:
+    def get_classname(self) -> str:
         return type(self).__name__
 
     def get_id(self) -> Union[str, Nothing]:
@@ -219,8 +216,7 @@ class HandlerContainer(
     Handler,
     BiList[_HandlerT],
     CoreHandlerContainer[_HandlerT, "HandlerContainer", "HandlerWrapper", "HandlerWrapperContainer", "Context"],
-    Generic[_HandlerT],
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    Generic[_HandlerT]
 ):
     def __init__(
         self,

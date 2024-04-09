@@ -2,9 +2,9 @@
 State Pattern for model state management.
 """
 from torchslime.utils.registry import Registry
-from torchslime.pipelines.metric import MeterDict
+from torchslime.pipeline.metric import MeterDict
 from torchslime.utils.decorator import FuncSetAttr
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Tuple,
     Mapping,
     Type,

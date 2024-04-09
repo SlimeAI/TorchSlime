@@ -1,7 +1,7 @@
 from torchslime.utils.registry import Registry
-from torchslime.handlers.wrapper import validation_check
+from torchslime.handler.wrapper import validation_check
 from torchslime.logging.logger import logger
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Generator,
     TYPE_CHECKING
 )
@@ -9,7 +9,7 @@ from torchslime.utils.base import (
     BaseGenerator,
     BaseGeneratorQueue
 )
-from slime_core.hooks.build import (
+from slime_core.abc.hook.build import (
     CoreBuildHook,
     CoreBuildInterface
 )

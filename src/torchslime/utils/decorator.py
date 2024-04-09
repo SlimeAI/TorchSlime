@@ -1,9 +1,11 @@
 from functools import wraps
-from .typing import (
+from .typing.native import (
     Union,
     Callable,
     TypeVar,
-    overload,
+    overload
+)
+from .typing.extension import (
     MISSING,
     Missing
 )

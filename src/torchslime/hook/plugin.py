@@ -3,14 +3,14 @@ from torchslime.utils.base import (
     BaseGenerator,
     BaseGeneratorQueue
 )
-from torchslime.hooks.build import BuildInterface
-from torchslime.utils.typing import (
+from torchslime.hook.build import BuildInterface
+from torchslime.utils.typing.native import (
     Generator,
     TYPE_CHECKING,
     TypeVar,
     Generic
 )
-from slime_core.hooks.plugin import (
+from slime_core.abc.hook.plugin import (
     CorePluginHook,
     CorePluginContainer
 )

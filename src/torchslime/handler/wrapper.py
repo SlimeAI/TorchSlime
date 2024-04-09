@@ -4,21 +4,23 @@ from torchslime.utils.base import (
     ContextGenerator,
     ContextManagerStack
 )
-from torchslime.utils.typing import (
-    NOTHING,
-    NoneOrNothing,
-    Nothing,
+from torchslime.utils.typing.native import (
     Union,
     List,
     Callable,
     Generator,
     TypeVar,
     TYPE_CHECKING,
-    STOP,
     Iterable,
-    Pass,
-    PASS,
     Generic
+)
+from torchslime.utils.typing.extension import (
+    NOTHING,
+    NoneOrNothing,
+    Nothing,
+    STOP,
+    Pass,
+    PASS
 )
 from torchslime.utils.exception import (
     HandlerBaseException,
@@ -26,12 +28,12 @@ from torchslime.utils.exception import (
 )
 from torchslime.logging.logger import logger
 from torchslime.logging.rich import RenderInterface, RenderableType
-from slime_core.handlers.wrapper import (
+from slime_core.abc.handler.wrapper import (
     CoreHandlerWrapper,
     CoreHandlerWrapperContainer
 )
 if TYPE_CHECKING:
-    from torchslime.pipelines.state import ModelState
+    from torchslime.pipeline.state import ModelState
     from torchslime.context import Context
 
 __all__ = [
@@ -158,7 +160,7 @@ class StateWrapper(HandlerWrapper[_HandlerT]):
             lifecycle=lifecycle
         )
         # get state supported
-        from torchslime.pipelines.state import ModelState, state_registry
+        from torchslime.pipeline.state import ModelState, state_registry
         registered_states = list(state_registry.keys())
         if not isinstance(state, ModelState) and state not in registered_states:
             logger.warning(

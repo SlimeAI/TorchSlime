@@ -1,42 +1,44 @@
-from torchslime.utils.typing import (
+from torch import Tensor
+from torch.optim import Optimizer
+from torchslime.utils.typing.native import (
     Any,
     Dict,
     Union,
     Callable,
     Iterable,
+    TYPE_CHECKING
+)
+from torchslime.utils.typing.extension import (
     is_none_or_nothing,
     Nothing,
     NOTHING,
     NoneOrNothing,
-    TYPE_CHECKING,
     Missing,
     MISSING,
-    TorchLRScheduler,
     EmptyFlag,
     is_empty_flag
 )
+from torchslime.utils.typing import TorchLRScheduler
 from torchslime.logging.logger import logger, LoggerKwargs
-from torchslime.pipelines.data import (
+from torchslime.pipeline.data import (
     ConstantProvider,
     DataParser,
     DataProvider,
     IndexParser
 )
-from torchslime.pipelines.metric import (
+from torchslime.pipeline.metric import (
     MetricContainer,
     LossReductionFactory,
     Metric,
     LossFunc,
     LossFuncContainer
 )
-from torchslime.hooks.build import BuildHook, build_registry
-from torchslime.hooks.launch import LaunchHook, launch_registry
-from torchslime.pipelines.profiler import PipelineProfiler, profiler_registry
-from torchslime.pipelines.state import ModelState, state_registry
+from torchslime.hook.build import BuildHook, build_registry
+from torchslime.hook.launch import LaunchHook, launch_registry
+from torchslime.pipeline.profiler import PipelineProfiler, profiler_registry
+from torchslime.pipeline.state import ModelState, state_registry
 from torchslime.utils.decorator import CallDebug, MethodChaining
-from slime_core.context.compile import CoreCompile, CompileFuncParams
-from torch import Tensor
-from torch.optim import Optimizer
+from slime_core.abc.context.compile import CoreCompile, CompileFuncParams
 # Type check only
 if TYPE_CHECKING:
     from . import Context, AcceptableDataType

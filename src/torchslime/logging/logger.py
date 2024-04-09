@@ -5,11 +5,13 @@ from torchslime.utils.launch import (
     Launcher,
     LaunchUtil
 )
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Union,
+    Iterable
+)
+from torchslime.utils.typing.extension import (
     Missing,
     MISSING,
-    Iterable,
     NoneOrNothing,
     Pass
 )

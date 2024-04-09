@@ -1,40 +1,29 @@
-from .typing import (
-    Any,
-    Dict,
-    TypeVar,
-    List,
-    Union,
-    Nothing,
-    Missing,
-    MISSING,
-    TYPE_CHECKING,
-    TextIO
-)
-from .base import (
-    BaseDict
-)
-from .metabase import Singleton
-from .metaclass import (
-    Metaclasses,
-    SingletonMetaclass,
-    InitOnceMetaclass
-)
+import threading
+from abc import ABCMeta
 from io import TextIOWrapper
 from slime_core.utils.store import (
     ScopedStore,
     CoreStore
 )
-# type hint only
-if TYPE_CHECKING:
-    from .base import (
-        ScopedAttrAssign
-    )
+from .metaclass import (
+    Metaclasses,
+    SingletonMetaclass
+)
+from .typing.native import (
+    List,
+    Union,
+    TextIO
+)
+from .typing.extension import (
+    Nothing
+)
+from .metaclass.metabase import Singleton
 
 
 class BuiltinScopedStore(
     ScopedStore,
     Singleton,
-    metaclass=Metaclasses(SingletonMetaclass, InitOnceMetaclass)
+    metaclass=Metaclasses(ABCMeta, SingletonMetaclass)
 ):
     
     def __init__(self) -> None:
@@ -85,7 +74,7 @@ class BuiltinScopedStore(
         rich._console = self.console_launcher
 
 
-BUILTIN_SCOPED_STORE_KEY = 'builtin__'
+# NOTE: ``_builtin_scoped_store`` is NOT thread-independent, and it is a global object.
 _builtin_scoped_store = BuiltinScopedStore()
 
 #
@@ -94,48 +83,12 @@ _builtin_scoped_store = BuiltinScopedStore()
 
 class Store(CoreStore):
     
-    # NOTE: ``_builtin_scoped_store`` is not contained in the 
-    # ``scoped_store_dict__``.
-    scoped_store_dict__: BaseDict[str, ScopedStore] = BaseDict()
+    scoped_store_local__: threading.local = threading.local()
     
-    def scope__(self, __key: str) -> Union[ScopedStore, BuiltinScopedStore]:
-        if __key == BUILTIN_SCOPED_STORE_KEY:
-            return _builtin_scoped_store
-        
-        return super().scope__(__key)
-
     def builtin__(self) -> BuiltinScopedStore:
-        return self.scope__(BUILTIN_SCOPED_STORE_KEY)
+        return _builtin_scoped_store
 
 
 store = Store()
 # Builtin scoped store delay initialization.
 store.builtin__().delay_init__()
-
-#
-# Store Assign
-#
-
-from .base import ScopedAttrAssign
-_ScopedStoreT = TypeVar("_ScopedStoreT", bound=ScopedStore)
-_BuiltinScopedStoreT = TypeVar("_BuiltinScopedStoreT", bound=BuiltinScopedStore)
-
-
-class StoreAssign(ScopedAttrAssign[_ScopedStoreT]):
-    
-    def __init__(
-        self,
-        attr_assign: Dict[str, Any],
-        key: Union[str, Missing] = MISSING
-    ) -> None:
-        self.key = store.get_current_key__() if key is MISSING else key
-        super().__init__(store.scope__(self.key), attr_assign)
-
-
-class BuiltinStoreAssign(StoreAssign[_BuiltinScopedStoreT]):
-    
-    def __init__(
-        self,
-        attr_assign: Dict[str, Any]
-    ) -> None:
-        super().__init__(attr_assign, BUILTIN_SCOPED_STORE_KEY)

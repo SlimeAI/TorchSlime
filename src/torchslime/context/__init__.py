@@ -1,30 +1,27 @@
 from .base import BaseContext
 from .compile import Compile
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     List,
     Union,
     Callable,
-    Iterable,
+    Iterable
+)
+from torchslime.utils.typing.extension import (
     is_none_or_nothing,
     NOTHING,
     Missing,
     MISSING
 )
-from torchslime.utils.metaclass import (
-    Metaclasses,
-    InitOnceMetaclass
-)
-from abc import ABCMeta
-from torchslime.pipelines.data import DataProvider
+from torchslime.pipeline.data import DataProvider
 from torchslime.utils.exception import APIMisused
 from torchslime.utils.store import store
 from torchslime.logging.logger import logger
 from torchslime.utils.common import count_params, get_device, type_cast
 from torchslime.utils.decorator import CallDebug, MethodChaining
 from torchslime.utils.base import AttrObserver, AttrObserve, AttrObservable
-from torchslime.hooks.build import BuildHook
-from torchslime.hooks.launch import LaunchHook
-from torchslime.hooks.plugin import PluginHook
+from torchslime.hook.build import BuildHook
+from torchslime.hook.launch import LaunchHook
+from torchslime.hook.plugin import PluginHook
 from torch.utils.data import DataLoader
 
 AcceptableDataType = Union[DataLoader, DataProvider]
@@ -32,8 +29,7 @@ AcceptableDataType = Union[DataLoader, DataProvider]
 
 class Context(
     BaseContext,
-    AttrObserver,
-    metaclass=Metaclasses(ABCMeta, InitOnceMetaclass)
+    AttrObserver
 ):
     def __init__(
         self,
@@ -157,12 +153,6 @@ class Context(
             logger.warning('``display_predict`` called before predict handlers are built.')
         self.pipeline_ctx.predict_container.display()
 
-    @CallDebug(module_name='Context.summary')
-    @MethodChaining
-    def summary(self) -> 'Context':
-        # TODO
-        pass
-
     @CallDebug(module_name='Context.install_plugins')
     @MethodChaining
     def install_plugins(self, plugins: Iterable[PluginHook]) -> 'Context':
@@ -190,7 +180,7 @@ class Context(
 # Try with handler exceptions
 #
 
-from torchslime.handlers import Handler
+from torchslime.handler import Handler
 from torchslime.utils.exception import HandlerException, HandlerTerminate
 
 def _handler_call(handler: Handler, ctx: Context):

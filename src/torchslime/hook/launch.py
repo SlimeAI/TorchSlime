@@ -2,12 +2,12 @@
 Distributed Launch Hook
 """
 from torchslime.utils.launch import LaunchUtil, VanillaLaunchUtil, DistributedLaunchUtil
-from torchslime.utils.typing import (
+from torchslime.utils.typing.native import (
     Generator,
     TYPE_CHECKING
 )
 from .build import BuildInterface
-from slime_core.hooks.launch import CoreLaunchHook
+from slime_core.abc.hook.launch import CoreLaunchHook
 from torchslime.utils.registry import Registry
 if TYPE_CHECKING:
     from torchslime.context import Context

@@ -1,16 +1,19 @@
 import os
 import inspect
-from .typing import (
-    NOTHING,
+from textwrap import indent
+from .typing.native import (
     Sequence,
     Union,
     Tuple,
     Dict,
     Iterator,
     TypeVar,
-    NoneOrNothing,
-    is_none_or_nothing,
     Any
+)
+from .typing.extension import (
+    NOTHING,
+    NoneOrNothing,
+    is_none_or_nothing
 )
 from slime_core.utils.common import *
 from torch.nn import Module
